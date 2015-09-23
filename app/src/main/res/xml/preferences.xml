@@ -3,69 +3,65 @@
 
     <PreferenceCategory android:title="Geofence settings">
         <EditTextPreference
-            android:defaultValue="52.000227"
             android:inputType="numberDecimal"
-            android:key="com.ruud.geofencehome.KEY_LATITUDE"
+            android:key="com.digiwiz.geofence.KEY_LATITUDE"
             android:summary="Enter the latitude of the GeoFence (i.e. 54.0)"
             android:title="Latitude of GeoFence" />
         <EditTextPreference
-            android:defaultValue="4.395108"
             android:inputType="numberDecimal"
-            android:key="com.ruud.geofencehome.KEY_LONGITUDE"
+            android:key="com.digiwiz.geofence.KEY_LONGITUDE"
             android:summary="Enter the longitude of the GeoFence (i.e. 4.0)"
             android:title="Longitude of GeoFence" />
         <EditTextPreference
             android:defaultValue="1000"
             android:inputType="numberDecimal"
-            android:key="com.ruud.geofencehome.KEY_RADIUS"
+            android:key="com.digiwiz.geofence.KEY_RADIUS"
             android:summary="Enter the radius (in meters) of the GeoFence"
             android:title="Radius of the GeoFence" />
         <CheckBoxPreference
-            android:key="com.ruud.geofencehome.KEY_SHOW_GEOFENCE_NOTIFICATION"
-            android:title="Notification when entering/exiting geofence"
-            android:defaultValue="true"/>
+            android:defaultValue="true"
+            android:key="com.digiwiz.geofence.KEY_SHOW_GEOFENCE_NOTIFICATION"
+            android:title="Notification when entering/exiting geofence" />
     </PreferenceCategory>
 
 
     <PreferenceCategory android:title="Location tracking">
         <CheckBoxPreference
-            android:key="com.ruud.geofencehome.KEY_TRACK_COORDINATES"
-            android:title="Show current location"
-            android:defaultValue="true"/>
+            android:defaultValue="false"
+            android:key="com.digiwiz.geofence.KEY_TRACK_COORDINATES"
+            android:title="Show current location" />
 
         <ListPreference
             android:defaultValue="102"
             android:entries="@array/listArray"
             android:entryValues="@array/listValues"
-            android:key="com.ruud.geofencehome.KEY_POWER_MODE"
+            android:key="com.digiwiz.geofence.KEY_POWER_MODE"
             android:summary="Select the location power mode"
             android:title="Location power mode" />
 
         <EditTextPreference
             android:defaultValue="60"
             android:inputType="numberDecimal"
-            android:key="com.ruud.geofencehome.KEY_UPDATE_INTERVAL"
+            android:key="com.digiwiz.geofence.KEY_UPDATE_INTERVAL"
             android:summary="Specify the update interval in seconds"
             android:title="Location update interval" />
         <CheckBoxPreference
-            android:key="com.ruud.geofencehome.KEY_SHOW_COORDINATES_NOTIFICATION"
-            android:title="Notification for current location"
-            android:defaultValue="true"/>
+            android:defaultValue="false"
+            android:key="com.digiwiz.geofence.KEY_SHOW_COORDINATES_NOTIFICATION"
+            android:title="Notification for current location" />
         />
 
     </PreferenceCategory>
 
     <PreferenceCategory android:title="URL settings">
         <EditTextPreference
-            android:defaultValue="http://zeus/geofence.php?enter=1"
-            android:key="com.ruud.geofencehome.KEY_ENTER_GEOFENCE_URL"
+            android:key="com.digiwiz.geofence.KEY_ENTER_GEOFENCE_URL"
             android:summary="Enter the URL (no https supported!) that will be called when entering the GeoFence"
             android:title="GeoFence Enter URL" />
         />
 
         <EditTextPreference
-            android:defaultValue="http://zeus/geofence.php?enter=0"
-            android:key="com.ruud.geofencehome.KEY_EXIT_GEOFENCE_URL"
+            android:key="com.digiwiz.geofence.KEY_EXIT_GEOFENCE_URL"
             android:summary="Enter the URL (no https supported!) that will be called when exiting the GeoFence"
             android:title="GeoFence Exit URL" />
         />
