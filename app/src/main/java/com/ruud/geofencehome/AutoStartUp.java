@@ -49,7 +49,7 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
     public void onCreate() {
         super.onCreate();
 
-        this.geofenceList = new ArrayList<Geofence>();
+        this.geofenceList = new ArrayList<>();
         this.geoStore = new SimpleGeofenceStore(this);
 
         if (!isGooglePlayServicesAvailable()) {
