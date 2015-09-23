@@ -7,14 +7,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
-import com.google.android.gms.location.LocationServices;
 import com.ruud.geofencehome.log.Log;
 import com.ruud.geofencehome.settings.SimpleGeofenceStore;
 
@@ -61,10 +57,10 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
             switch (transitionType) {
                 case Geofence.GEOFENCE_TRANSITION_ENTER:
 
-                    Log.i(Constants.LOG_TAG, " Entering GeoFence");
-                    Log.i(Constants.LOG_TAG, " - Latitude:  " + triggeringLocation.getLatitude());
-                    Log.i(Constants.LOG_TAG, " - Longitude: " + triggeringLocation.getLongitude());
-                    Log.i(Constants.LOG_TAG, " - Accuracy:  " + triggeringLocation.getAccuracy() + " meter(s)");
+                    Log.i(Constants.LOG_TAG, "Entering GeoFence");
+                    Log.i(Constants.LOG_TAG, "- Latitude:  " + triggeringLocation.getLatitude());
+                    Log.i(Constants.LOG_TAG, "- Longitude: " + triggeringLocation.getLongitude());
+                    Log.i(Constants.LOG_TAG, "- Accuracy:  " + triggeringLocation.getAccuracy() + " meter(s)");
 
                     // Since we only support 1 geofence we can get get the first geofence id triggered.
                     // in some cases you might want to consider the full list
@@ -79,10 +75,10 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
                     break;
 
                 case Geofence.GEOFENCE_TRANSITION_EXIT:
-                    Log.i(Constants.LOG_TAG, " Exiting GeoFence");
-                    Log.i(Constants.LOG_TAG, " - Latitude:  " + triggeringLocation.getLatitude());
-                    Log.i(Constants.LOG_TAG, " - Longitude: " + triggeringLocation.getLongitude());
-                    Log.i(Constants.LOG_TAG, " - Accuracy:  " + triggeringLocation.getAccuracy() + " meter(s)");
+                    Log.i(Constants.LOG_TAG, "Exiting GeoFence");
+                    Log.i(Constants.LOG_TAG, "- Latitude:  " + triggeringLocation.getLatitude());
+                    Log.i(Constants.LOG_TAG, "- Longitude: " + triggeringLocation.getLongitude());
+                    Log.i(Constants.LOG_TAG, "- Accuracy:  " + triggeringLocation.getAccuracy() + " meter(s)");
 
                     triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0)
                             .getRequestId();
@@ -106,8 +102,8 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
 
             long when = System.currentTimeMillis();
 
-            String contentText = "Lat: " + triggeringLocation.getLatitude() + " Long: " + triggeringLocation.getLongitude() +
-                    " Acc: " + triggeringLocation.getAccuracy() + " meter(s)";
+            String contentText = triggeringLocation.getLatitude() + "," + triggeringLocation.getLongitude() +
+                    " (" + Math.round(triggeringLocation.getAccuracy()) + "m)";
 
             Intent notifyIntent = new Intent(this, MainActivity.class);
              notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
