@@ -132,7 +132,7 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
              *
              */
 
-
+/*
             double lat = 52.103368;
             double lng = 4.313771;
             float radius = 1000;
@@ -146,7 +146,7 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
                     .build();
 
             geofenceList.add(debugFence);
-
+*/
             LocationServices.GeofencingApi.addGeofences(mApiClient, geofenceList,
                     mGeofenceRequestIntent);
 
