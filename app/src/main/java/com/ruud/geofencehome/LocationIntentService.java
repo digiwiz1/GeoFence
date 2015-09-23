@@ -55,10 +55,10 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
 
         Log.i(Constants.LOG_TAG, currentDateTimeString );
         Log.i(Constants.LOG_TAG, "Location update");
-        Log.i(Constants.LOG_TAG, "- Latitude:  " + triggeringLocation.getLatitude());
-        Log.i(Constants.LOG_TAG, "- Longitude: " + triggeringLocation.getLongitude());
-        Log.i(Constants.LOG_TAG, "- Accuracy:  " + triggeringLocation.getAccuracy() + " meter(s)");
-        Log.i(Constants.LOG_TAG, "- Distance:  " + distance + " meter(s)");
+        Log.i(Constants.LOG_TAG, "- Latitude:               " + triggeringLocation.getLatitude());
+        Log.i(Constants.LOG_TAG, "- Longitude:              " + triggeringLocation.getLongitude());
+        Log.i(Constants.LOG_TAG, "- Accuracy:               " + triggeringLocation.getAccuracy() + " meter(s)");
+        Log.i(Constants.LOG_TAG, "- Distance to geofence:   " + distance + " meter(s)");
 
         generateNotification("Leaving", triggeringLocation);
     }

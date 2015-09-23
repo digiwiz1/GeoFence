@@ -3,13 +3,14 @@ package com.ruud.geofencehome;
 /**
  * Created by Ruud on 20-8-2015.
  */
+
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.content.Intent;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -97,7 +98,7 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
             enableCoordinates();
             addGeoFence();
         } else {
-            Log.i(Constants.LOG_TAG, "Googgle Plat services not connected");
+            Log.i(Constants.LOG_TAG, "Googgle Play services not connected");
         }
     }
 
@@ -175,7 +176,7 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
     public void enableCoordinates() {
 
         if (geoStore.getTracking()) {
-            Log.i(Constants.LOG_TAG, "Enable location tracking");
+            Log.i(Constants.LOG_TAG, "Location tracking is enabled");
             LocationRequest locationRequest = com.google.android.gms.location.LocationRequest.create();
 
             //Set the update interval after which a new location request will be issued
@@ -188,7 +189,7 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
 
             LocationServices.FusedLocationApi.requestLocationUpdates(mApiClient, locationRequest, mLocationRequestIntent);
         } else {
-            Log.i(Constants.LOG_TAG, "Disable location tracking");
+            Log.i(Constants.LOG_TAG, "Location tracking is disabled");
             LocationServices.FusedLocationApi.removeLocationUpdates(mApiClient, mLocationRequestIntent);
         }
     }
