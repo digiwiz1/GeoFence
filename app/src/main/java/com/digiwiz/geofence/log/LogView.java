@@ -147,5 +147,8 @@ public class LogView extends TextView implements LogNode {
         append("\n" + s);
     }
 
+    public void clearLog() {
+        setText("");
+    }
 
 }

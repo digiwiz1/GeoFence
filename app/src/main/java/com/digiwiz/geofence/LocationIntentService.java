@@ -47,27 +47,29 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
 
         SimpleGeofenceStore store = new SimpleGeofenceStore(this);
 
-        //calc distance to geofence
-        Location geoFence = new Location("");
-        geoFence.setLatitude(store.getLatitude());
-        geoFence.setLongitude(store.getLongitude());
-        int distance = Math.round(triggeringLocation.distanceTo(geoFence));
+        if (store.getLocationShowInLog()) {
 
-        Log.i(Constants.LOG_TAG, currentDateTimeString);
-        Log.i(Constants.LOG_TAG, "Location update");
-        Log.i(Constants.LOG_TAG, "- Latitude:               " + triggeringLocation.getLatitude());
-        Log.i(Constants.LOG_TAG, "- Longitude:              " + triggeringLocation.getLongitude());
-        Log.i(Constants.LOG_TAG, "- Accuracy:               " + triggeringLocation.getAccuracy() + " meter(s)");
-        Log.i(Constants.LOG_TAG, "- Distance to geofence:   " + distance + " meter(s)");
+            //calc distance to geofence
+            Location geoFence = new Location("");
+            geoFence.setLatitude(store.getLatitude());
+            geoFence.setLongitude(store.getLongitude());
+            int distance = Math.round(triggeringLocation.distanceTo(geoFence));
 
-        generateNotification("Leaving", triggeringLocation);
+            Log.i(Constants.LOG_TAG, currentDateTimeString + ": Location update");
+            Log.i(Constants.LOG_TAG, "- Latitude:               " + triggeringLocation.getLatitude());
+            Log.i(Constants.LOG_TAG, "- Longitude:              " + triggeringLocation.getLongitude());
+            Log.i(Constants.LOG_TAG, "- Accuracy:               " + Math.round(triggeringLocation.getAccuracy()) + " meter");
+            Log.i(Constants.LOG_TAG, "- Distance to geofence:   " + distance + " meter");
+        }
+
+        if (store.getLocationNotify()) {
+            generateNotification("Leaving", triggeringLocation);
+        }
     }
 
     private void generateNotification(String address, Location triggeringLocation) {
 
         SimpleGeofenceStore store = new SimpleGeofenceStore(this);
-
-        if (store.getCoordinatesNotify()) {
 
             long when = System.currentTimeMillis();
 
@@ -97,7 +99,7 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
 
             //Send notification- always with ID=2 so it will update existing location notifications
             notificationManager.notify(2, builder.build());
-        }
+
     }
 
 

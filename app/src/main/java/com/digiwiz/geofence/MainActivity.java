@@ -1,7 +1,5 @@
 package com.digiwiz.geofence;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +7,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.digiwiz.geofence.log.Log;
 import com.digiwiz.geofence.log.LogFragment;
@@ -21,6 +21,18 @@ public class MainActivity extends FragmentActivity implements
 
     private SharedPreferences mPrefs;
     private Intent service;
+    /**
+     * Click Handler - This will clear the textview whenever someone clicks it.
+     */
+    private View.OnClickListener yourClickListener = new View.OnClickListener() {
+        public void onClick(View v) {
+
+            LogFragment logFragment = (LogFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.log_fragment);
+            logFragment.getLogView().clearLog();
+
+        }
+    };
 
     @Override
     protected void onStart() {
@@ -55,9 +67,12 @@ public class MainActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        Button clearButton = (Button) findViewById(R.id.clearButton);
+
+        clearButton.setOnClickListener(yourClickListener);
+
         service = new Intent(getApplicationContext(), AutoStartUp.class);
     }
-
 
     /**
      * Create a chain of targets that will receive log data
@@ -78,14 +93,11 @@ public class MainActivity extends FragmentActivity implements
                 .findFragmentById(R.id.log_fragment);
         msgFilter.setNext(logFragment.getLogView());
 
-        //Log.i(Constants.LOG_TAG, "init logging");
     }
 
     //@Override
     public void onResume() {
         super.onResume();
-
-        //Log.i(Constants.LOG_TAG, "onResume");
 
         // To use the preferences when the activity starts and when the user navigates back from the settings activity.
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -97,8 +109,6 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        //Log.i(Constants.LOG_TAG, "Settings updated");
-
         stopService(service);
         startService(service);
     }
@@ -106,24 +116,8 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        //Log.i(Constants.LOG_TAG, "onPause");
 
         mPrefs.unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-
-            //Log.i(Constants.LOG_TAG, "Service name:" + service.service.getClassName());
-
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                //Log.i(Constants.LOG_TAG, "FOUND SERVICE");
-                return true;
-            }
-        }
-        return false;
     }
 
 }

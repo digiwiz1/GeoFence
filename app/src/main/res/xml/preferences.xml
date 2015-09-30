@@ -18,6 +18,14 @@
             android:key="com.digiwiz.geofence.KEY_RADIUS"
             android:summary="Enter the radius (in meters) of the GeoFence"
             android:title="Radius of the GeoFence" />
+
+        <EditTextPreference
+            android:defaultValue="30"
+            android:inputType="numberDecimal"
+            android:key="com.digiwiz.geofence.KEY_RESPONSIVENESS"
+            android:summary="Sets the best-effort notification responsiveness of the geofence. Setting a big responsiveness value, for example 5 minutes, can save power significantly. However, setting a very small responsiveness value, for example 5 seconds, doesn't necessarily mean you will get notified right after the user enters or exits a geofence: internally, the geofence might adjust the responsiveness value to save power when needed."
+            android:title="Notification response time in seconds" />
+
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="com.digiwiz.geofence.KEY_SHOW_GEOFENCE_NOTIFICATION"
@@ -25,11 +33,17 @@
     </PreferenceCategory>
 
 
-    <PreferenceCategory android:title="Location tracking">
+    <PreferenceCategory android:title="Location polling">
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="com.digiwiz.geofence.KEY_TRACK_COORDINATES"
-            android:title="Show current location" />
+            android:key="com.digiwiz.geofence.KEY_POLL_COORDINATES"
+            android:summary="When enabled the application will actively poll for the location. When disabled the application depends on location updates from other (background) applications"
+            android:title="Active location polling" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="com.digiwiz.geofence.KEY_SHOW_COORDINATES"
+            android:title="Show the location updates in the log" />
 
         <ListPreference
             android:defaultValue="102"
@@ -40,14 +54,22 @@
             android:title="Location power mode" />
 
         <EditTextPreference
-            android:defaultValue="60"
+            android:defaultValue="30"
             android:inputType="numberDecimal"
             android:key="com.digiwiz.geofence.KEY_UPDATE_INTERVAL"
-            android:summary="Specify the update interval in seconds"
-            android:title="Location update interval" />
+            android:summary="Specify the polling interval in seconds"
+            android:title="Location polling interval" />
+
+        <EditTextPreference
+            android:defaultValue="30"
+            android:inputType="numberDecimal"
+            android:key="com.digiwiz.geofence.KEY_FASTEST_UPDATE_INTERVAL"
+            android:summary="Specify the polling interval in seconds. This controls the fastest rate at which the application will receive location updates, which might be faster than the specified location polling interval long in some situations (for example, if other applications are triggering location updates)."
+            android:title="Fastest location polling interval" />
+
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="com.digiwiz.geofence.KEY_SHOW_COORDINATES_NOTIFICATION"
+            android:key="com.digiwiz.geofence.KEY_NOTIFY_COORDINATES"
             android:title="Notification for current location" />
         />
 

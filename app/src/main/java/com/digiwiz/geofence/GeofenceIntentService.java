@@ -52,17 +52,16 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
             int transitionType = geoFenceEvent.getGeofenceTransition();
             Location triggeringLocation = geoFenceEvent.getTriggeringLocation();
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-            Log.i(Constants.LOG_TAG, currentDateTimeString);
 
             switch (transitionType) {
                 case Geofence.GEOFENCE_TRANSITION_ENTER:
 
-                    Log.i(Constants.LOG_TAG, "Entering GeoFence");
+                    Log.i(Constants.LOG_TAG, currentDateTimeString + ": Entering GeoFence ");
                     Log.i(Constants.LOG_TAG, "- Latitude:  " + triggeringLocation.getLatitude());
                     Log.i(Constants.LOG_TAG, "- Longitude: " + triggeringLocation.getLongitude());
-                    Log.i(Constants.LOG_TAG, "- Accuracy:  " + triggeringLocation.getAccuracy() + " meter(s)");
+                    Log.i(Constants.LOG_TAG, "- Accuracy:  " + Math.round(triggeringLocation.getAccuracy()) + " meter");
 
-                    // Since we only support 1 geofence we can get get the first geofence id triggered.
+                    // Since we only support 1 geofence we can get the first geofence id triggered.
                     // in some cases you might want to consider the full list
                     // of geofences triggered.
                     String triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0)
@@ -75,10 +74,10 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
                     break;
 
                 case Geofence.GEOFENCE_TRANSITION_EXIT:
-                    Log.i(Constants.LOG_TAG, "Exiting GeoFence");
+                    Log.i(Constants.LOG_TAG, currentDateTimeString + ": Exiting GeoFence");
                     Log.i(Constants.LOG_TAG, "- Latitude:  " + triggeringLocation.getLatitude());
                     Log.i(Constants.LOG_TAG, "- Longitude: " + triggeringLocation.getLongitude());
-                    Log.i(Constants.LOG_TAG, "- Accuracy:  " + triggeringLocation.getAccuracy() + " meter(s)");
+                    Log.i(Constants.LOG_TAG, "- Accuracy:  " + Math.round(triggeringLocation.getAccuracy()) + " meter");
 
                     triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0)
                             .getRequestId();

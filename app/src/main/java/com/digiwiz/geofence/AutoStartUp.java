@@ -17,24 +17,20 @@ import com.digiwiz.geofence.settings.SimpleGeofenceStore;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import java.util.ArrayList;
 
 public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-
     private GoogleApiClient mApiClient;
-
-    private ArrayList<Geofence> geofenceList;
     private SharedPreferences mPrefs;
 
     // Stores the PendingIntent used to request geofence monitoring.
     private PendingIntent mGeofenceRequestIntent;
+
     // Stores the PendingIntent used to request location monitoring.
     private PendingIntent mLocationRequestIntent;
 
@@ -49,7 +45,7 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
     public void onCreate() {
         super.onCreate();
 
-        this.geofenceList = new ArrayList<>();
+        //this.geofenceList = new ArrayList<>();
         this.geoStore = new SimpleGeofenceStore(this);
 
         if (!isGooglePlayServicesAvailable()) {
@@ -68,8 +64,6 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mPrefs.registerOnSharedPreferenceChangeListener(this);
 
-        //Log.i(Constants.LOG_TAG, "Start Service");
-
     }
 
     /**
@@ -87,10 +81,8 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
         }
     }
 
-
     @Override
     public void onConnected(Bundle bundle) {
-        //Log.e(Constants.LOG_TAG, "Google Play onConnected.");
         mGeofenceRequestIntent = getGeofencePendingIntent();
         mLocationRequestIntent = getLocationPendingIntent();
 
@@ -105,51 +97,24 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
     @Override
     public void onConnectionSuspended(int i) {
         if (null != mGeofenceRequestIntent) {
-            //Log.i(Constants.LOG_TAG, "Removing geofence");
             LocationServices.GeofencingApi.removeGeofences(mApiClient, mGeofenceRequestIntent);
         }
     }
 
     public void reloadGeoFence() {
-        //Log.i(Constants.LOG_TAG, "Reload geofence");
-
         //remove the fences from the API
         LocationServices.GeofencingApi.removeGeofences(mApiClient, mGeofenceRequestIntent);
-        //clear the array
-        geofenceList.clear();
-        //re-add the fences
+
+        //re-add the geofences
         addGeoFence();
     }
 
     public void addGeoFence() {
-        Geofence geofence = geoStore.getGeofence();
-        if (geofence == null) {
+        GeofencingRequest requests = geoStore.getGeofencingRequests();
+        if (requests == null) {
             Log.w(Constants.LOG_TAG, "No configuration found. Please configure the geofence first...");
         } else {
-            geofenceList.add(geofence);
-
-            /** Add a geofence ay current location for debug purposes
-             *
-             */
-
-/*
-            double lat = 52.103368;
-            double lng = 4.313771;
-            float radius = 1000;
-
-            // Build a new Geofence object.
-            Geofence debugFence = new Geofence.Builder()
-                    .setRequestId("Debug")
-                    .setCircularRegion(lat, lng, radius)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                    .build();
-
-            geofenceList.add(debugFence);
-*/
-            LocationServices.GeofencingApi.addGeofences(mApiClient, geofenceList,
-                    mGeofenceRequestIntent);
-
+            LocationServices.GeofencingApi.addGeofences(mApiClient, requests, mGeofenceRequestIntent);
         }
     }
 
@@ -175,21 +140,21 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
 
     public void enableCoordinates() {
 
-        if (geoStore.getTracking()) {
-            Log.i(Constants.LOG_TAG, "Location tracking is enabled");
+        if (geoStore.getLocationActivePolling()) {
+            Log.i(Constants.LOG_TAG, "Active Location polling is enabled");
             LocationRequest locationRequest = com.google.android.gms.location.LocationRequest.create();
 
             //Set the update interval after which a new location request will be issued
-            locationRequest.setInterval(geoStore.getUpdateInterval());
+            locationRequest.setInterval(geoStore.getLocationUpdateInterval());
 
-            //Set the interval for receiving location updates triggered by other applications
-            locationRequest.setFastestInterval(60 * 1000); //1 minute (specified in milliseconds)
+            //Set the fastest receive interval for receiving location updates
+            locationRequest.setFastestInterval(geoStore.getFastestLocationUpdateInterval());
 
             locationRequest.setPriority(geoStore.getPowerMode());
 
             LocationServices.FusedLocationApi.requestLocationUpdates(mApiClient, locationRequest, mLocationRequestIntent);
         } else {
-            Log.i(Constants.LOG_TAG, "Location tracking is disabled");
+            Log.i(Constants.LOG_TAG, "Active Location polling is disabled");
             LocationServices.FusedLocationApi.removeLocationUpdates(mApiClient, mLocationRequestIntent);
         }
     }

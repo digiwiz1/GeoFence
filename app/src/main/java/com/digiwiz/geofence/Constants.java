@@ -32,7 +32,12 @@ public final class Constants {
     public static final String KEY_LATITUDE = "com.digiwiz.geofence.KEY_LATITUDE";
     public static final String KEY_LONGITUDE = "com.digiwiz.geofence.KEY_LONGITUDE";
     public static final String KEY_RADIUS = "com.digiwiz.geofence.KEY_RADIUS";
-    public static final String KEY_TRACK_COORDINATES = "com.digiwiz.geofence.KEY_TRACK_COORDINATES";
+    public static final String KEY_POLL_COORDINATES = "com.digiwiz.geofence.KEY_POLL_COORDINATES";
+    public static final String KEY_SHOW_COORDINATES = "com.digiwiz.geofence.KEY_SHOW_COORDINATES";
+    public static final String KEY_NOTIFY_COORDINATES = "com.digiwiz.geofence.KEY_NOTIFY_COORDINATES";
+    public static final String KEY_FASTEST_UPDATE_INTERVAL = "com.digiwiz.geofence.KEY_FASTEST_UPDATE_INTERVAL";
+
+    public static final String KEY_RESPONSIVENESS = "com.digiwiz.geofence.KEY_RESPONSIVENESS";
 
     private Constants() {
     }
