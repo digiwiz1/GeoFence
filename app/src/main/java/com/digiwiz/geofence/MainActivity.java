@@ -72,6 +72,7 @@ public class MainActivity extends FragmentActivity implements
         clearButton.setOnClickListener(yourClickListener);
 
         service = new Intent(getApplicationContext(), AutoStartUp.class);
+        startService(service);
     }
 
     /**
@@ -103,12 +104,15 @@ public class MainActivity extends FragmentActivity implements
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mPrefs.registerOnSharedPreferenceChangeListener(this);
 
-        startService(service);
+        //Enable logging when resuming
+        // Log.enableLogging();
     }
 
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+        //restart service to reload the config - not the best way of doing things (aka quick&dirty)
         stopService(service);
         startService(service);
     }
@@ -118,6 +122,9 @@ public class MainActivity extends FragmentActivity implements
         super.onPause();
 
         mPrefs.unregisterOnSharedPreferenceChangeListener(this);
+
+        //Disable logging when onPaused
+        //Log.disableLogging();
     }
 
 }

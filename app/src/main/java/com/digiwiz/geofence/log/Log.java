@@ -34,8 +34,19 @@ public class Log {
     public static final int ERROR = android.util.Log.ERROR;
     public static final int ASSERT = android.util.Log.ASSERT;
 
+    public static boolean loggingEnabled = true;
+
     // Stores the beginning of the LogNode topology.
     private static LogNode mLogNode;
+
+    public static void enableLogging() {
+        loggingEnabled = true;
+    }
+
+    public static void disableLogging() {
+        loggingEnabled = false;
+    }
+
 
     /**
      * Returns the next LogNode in the linked list.
@@ -62,8 +73,10 @@ public class Log {
      *                 to extract and print useful information.
      */
     public static void println(int priority, String tag, String msg, Throwable tr) {
-        if (mLogNode != null) {
-            mLogNode.println(priority, tag, msg, tr);
+        if (loggingEnabled) {
+            if (mLogNode != null) {
+                mLogNode.println(priority, tag, msg, tr);
+            }
         }
     }
 
@@ -76,7 +89,9 @@ public class Log {
      * @param msg      The actual message to be logged. The actual message to be logged.
      */
     public static void println(int priority, String tag, String msg) {
-        println(priority, tag, msg, null);
+        if (loggingEnabled) {
+            println(priority, tag, msg, null);
+        }
     }
 
     /**
