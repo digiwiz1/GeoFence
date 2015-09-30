@@ -43,7 +43,7 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="com.digiwiz.geofence.KEY_SHOW_COORDINATES"
-            android:summary="This will continue when running in the background and can drain your battery, memory and storage!"
+            android:summary="Logging will continue when running in the background and can drain your battery, memory and storage!"
             android:title="Show location updates in the log." />
 
         <ListPreference
