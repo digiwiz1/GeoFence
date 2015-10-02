@@ -34,13 +34,83 @@ import java.util.ArrayList;
  */
 public class SimpleGeofenceStore {
     // The SharedPreferences object in which geofences are stored.
-    private final SharedPreferences mPrefs;
+    private static SharedPreferences mPrefs;
 
     /**
      * Create the SharedPreferences storage with private access only.
      */
     public SimpleGeofenceStore(Context context) {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    // Instance field getters.
+    public static double getLatitude() {
+        String value = mPrefs.getString(Constants.KEY_LATITUDE, "");
+        if (!value.isEmpty()) {
+
+            try {
+                return Double.valueOf(value);
+            } catch (NumberFormatException ex) {
+                Log.e(Constants.LOG_TAG, "Entered value for latitude has an invalid format");
+                return 0;
+            }
+        } else return 0;
+    }
+
+    public static double getLongitude() {
+        String value = mPrefs.getString(Constants.KEY_LONGITUDE, "");
+        if (!value.isEmpty()) {
+            try {
+                return Double.valueOf(value);
+            } catch (NumberFormatException ex) {
+                Log.e(Constants.LOG_TAG, "Entered value for longitude has an invalid format");
+                return 0;
+            }
+        } else return 0;
+    }
+
+    /**
+     * Check if geofence notifications are requested
+     *
+     * @return True - Notification enabled
+     */
+    public static boolean getGeofenceNotify() {
+        return mPrefs.getBoolean(Constants.KEY_SHOW_GEOFENCE_NOTIFICATION, true);
+    }
+
+    /**
+     * Check if user wants location updates to be logged
+     *
+     * @return True - Log the location updates
+     */
+    public static boolean getGeofenceShowInLog() {
+        return mPrefs.getBoolean(Constants.KEY_LOG_GEOFENCE_NOTIFICATION, false);
+    }
+
+    /**
+     * Check if user wants location updates to be logged
+     *
+     * @return True - Log the location updates
+     */
+    public static boolean getLocationShowInLog() {
+        return mPrefs.getBoolean(Constants.KEY_SHOW_COORDINATES, false);
+    }
+
+    /**
+     * Check if location update notifications are requested
+     *
+     * @return True - Notification enabled
+     */
+    public static boolean getLocationNotify() {
+        return mPrefs.getBoolean(Constants.KEY_NOTIFY_COORDINATES, false);
+    }
+
+    public static String getGeoFenceEnterUrl() {
+        return mPrefs.getString(Constants.KEY_ENTER_GEOFENCE_URL, "");
+    }
+
+    public static String getGeoFenceExitUrl() {
+        return mPrefs.getString(Constants.KEY_EXIT_GEOFENCE_URL, "");
     }
 
     private Geofence getGeofence() {
@@ -97,34 +167,8 @@ public class SimpleGeofenceStore {
                 .setCircularRegion(lat, lng, radius)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                        //.setNotificationResponsiveness(responseNotification * 1000)
+                .setNotificationResponsiveness(responseNotification * 1000)
                 .build();
-    }
-
-    // Instance field getters.
-    public double getLatitude() {
-        String value = mPrefs.getString(Constants.KEY_LATITUDE, "");
-        if (!value.isEmpty()) {
-
-            try {
-                return Double.valueOf(value);
-            } catch (NumberFormatException ex) {
-                Log.e(Constants.LOG_TAG, "Entered value for latitude has an invalid format");
-                return 0;
-            }
-        } else return 0;
-    }
-
-    public double getLongitude() {
-        String value = mPrefs.getString(Constants.KEY_LONGITUDE, "");
-        if (!value.isEmpty()) {
-            try {
-                return Double.valueOf(value);
-            } catch (NumberFormatException ex) {
-                Log.e(Constants.LOG_TAG, "Entered value for longitude has an invalid format");
-                return 0;
-            }
-        } else return 0;
     }
 
     public float getRadius() {
@@ -177,16 +221,6 @@ public class SimpleGeofenceStore {
         } else return 0;
     }
 
-
-    /**
-     * Check if geofence notifications are requested
-     *
-     * @return True - Notification enabled
-     */
-    public boolean getGeofenceNotify() {
-        return mPrefs.getBoolean(Constants.KEY_SHOW_GEOFENCE_NOTIFICATION, true);
-    }
-
     /**
      * Check if active location polling is requested
      *
@@ -195,34 +229,6 @@ public class SimpleGeofenceStore {
     public boolean getLocationActivePolling() {
         return mPrefs.getBoolean(Constants.KEY_POLL_COORDINATES, false);
     }
-
-    /**
-     * Check if user wants location updates to be logged
-     *
-     * @return True - Log the location updates
-     */
-    public boolean getLocationShowInLog() {
-        return mPrefs.getBoolean(Constants.KEY_SHOW_COORDINATES, false);
-    }
-
-    /**
-     * Check if location update notifications are requested
-     *
-     * @return True - Notification enabled
-     */
-    public boolean getLocationNotify() {
-        return mPrefs.getBoolean(Constants.KEY_NOTIFY_COORDINATES, false);
-    }
-
-
-    public String getGeoFenceEnterUrl() {
-        return mPrefs.getString(Constants.KEY_ENTER_GEOFENCE_URL, "");
-    }
-
-    public String getGeoFenceExitUrl() {
-        return mPrefs.getString(Constants.KEY_EXIT_GEOFENCE_URL, "");
-    }
-
 
     public GeofencingRequest getGeofencingRequests() {
         ArrayList<Geofence> geofenceList = new ArrayList<>();

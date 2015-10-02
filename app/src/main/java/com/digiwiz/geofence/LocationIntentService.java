@@ -45,40 +45,31 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
 
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
-        SimpleGeofenceStore store = new SimpleGeofenceStore(this);
-
-        if (store.getLocationShowInLog()) {
+        if (SimpleGeofenceStore.getLocationShowInLog()) {
 
             //calc distance to geofence
             Location geoFence = new Location("");
-            geoFence.setLatitude(store.getLatitude());
-            geoFence.setLongitude(store.getLongitude());
+            geoFence.setLatitude(SimpleGeofenceStore.getLatitude());
+            geoFence.setLongitude(SimpleGeofenceStore.getLongitude());
             int distance = Math.round(triggeringLocation.distanceTo(geoFence));
 
-            Log.i(Constants.LOG_TAG, currentDateTimeString + ": Location update");
-            Log.i(Constants.LOG_TAG, "- Latitude:               " + triggeringLocation.getLatitude());
-            Log.i(Constants.LOG_TAG, "- Longitude:              " + triggeringLocation.getLongitude());
-            Log.i(Constants.LOG_TAG, "- Accuracy:               " + Math.round(triggeringLocation.getAccuracy()) + " meter");
-            Log.i(Constants.LOG_TAG, "- Distance to geofence:   " + distance + " meter");
+            String contentText = currentDateTimeString + ": Location update (LAT:" + triggeringLocation.getLatitude() + " LON:" + triggeringLocation.getLongitude() +
+                    " Accuracy:" + Math.round(triggeringLocation.getAccuracy()) + "m" + " Distance: " + distance + "m)";
+            Log.i(Constants.LOG_TAG, contentText);
         }
 
-        if (store.getLocationNotify()) {
+        if (SimpleGeofenceStore.getLocationNotify()) {
             generateNotification("Leaving", triggeringLocation);
         }
     }
 
     private void generateNotification(String address, Location triggeringLocation) {
-
-        SimpleGeofenceStore store = new SimpleGeofenceStore(this);
-
             long when = System.currentTimeMillis();
 
             String contentText = triggeringLocation.getLatitude() + "," + triggeringLocation.getLongitude() +
                     " (" + Math.round(triggeringLocation.getAccuracy()) + "m)";
 
             Intent notifyIntent = new Intent(this, MainActivity.class);
-            //notifyIntent.putExtra("id", locationId);
-            //notifyIntent.putExtra("address", address);
             notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -99,13 +90,11 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
 
             //Send notification- always with ID=2 so it will update existing location notifications
             notificationManager.notify(2, builder.build());
-
     }
 
 
     @Override
     public void onConnected(Bundle bundle) {
-
     }
 
     @Override

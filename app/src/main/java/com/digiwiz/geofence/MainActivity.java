@@ -1,9 +1,9 @@
 package com.digiwiz.geofence;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,11 +16,10 @@ import com.digiwiz.geofence.log.LogWrapper;
 import com.digiwiz.geofence.log.MessageOnlyLogFilter;
 import com.digiwiz.geofence.settings.SettingsActivity;
 
-public class MainActivity extends FragmentActivity implements
-        SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends FragmentActivity {
 
-    private SharedPreferences mPrefs;
     private Intent service;
+
     /**
      * Click Handler - This will clear the textview whenever someone clicks it.
      */
@@ -72,7 +71,12 @@ public class MainActivity extends FragmentActivity implements
         clearButton.setOnClickListener(yourClickListener);
 
         service = new Intent(getApplicationContext(), AutoStartUp.class);
-        startService(service);
+
+        //Check if service is already running before starting
+        if (!isMyServiceRunning(AutoStartUp.class)) {
+            Log.i(Constants.LOG_TAG, "Starting Geofence service");
+            startService(service);
+        }
     }
 
     /**
@@ -93,16 +97,11 @@ public class MainActivity extends FragmentActivity implements
         LogFragment logFragment = (LogFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.log_fragment);
         msgFilter.setNext(logFragment.getLogView());
-
     }
 
-    //@Override
+    @Override
     public void onResume() {
         super.onResume();
-
-        // To use the preferences when the activity starts and when the user navigates back from the settings activity.
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mPrefs.registerOnSharedPreferenceChangeListener(this);
 
         //Enable logging when resuming
         // Log.enableLogging();
@@ -110,21 +109,21 @@ public class MainActivity extends FragmentActivity implements
 
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
-        //restart service to reload the config - not the best way of doing things (aka quick&dirty)
-        stopService(service);
-        startService(service);
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
 
-        mPrefs.unregisterOnSharedPreferenceChangeListener(this);
-
         //Disable logging when onPaused
         //Log.disableLogging();
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

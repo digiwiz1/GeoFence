@@ -36,7 +36,7 @@ public final class Constants {
     public static final String KEY_SHOW_COORDINATES = "com.digiwiz.geofence.KEY_SHOW_COORDINATES";
     public static final String KEY_NOTIFY_COORDINATES = "com.digiwiz.geofence.KEY_NOTIFY_COORDINATES";
     public static final String KEY_FASTEST_UPDATE_INTERVAL = "com.digiwiz.geofence.KEY_FASTEST_UPDATE_INTERVAL";
-
+    public static final String KEY_LOG_GEOFENCE_NOTIFICATION = "com.digiwiz.geofence.KEY_LOG_GEOFENCE_NOTIFICATION";
     public static final String KEY_RESPONSIVENESS = "com.digiwiz.geofence.KEY_RESPONSIVENESS";
 
     private Constants() {

@@ -27,6 +27,12 @@
             android:title="Notification response time in seconds" />
 
         <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="com.digiwiz.geofence.KEY_LOG_GEOFENCE_NOTIFICATION"
+            android:summary="Logging will continue when running in the background and can drain your battery, memory and storage!"
+            android:title="Show geofence updates in the log." />
+
+        <CheckBoxPreference
             android:defaultValue="true"
             android:key="com.digiwiz.geofence.KEY_SHOW_GEOFENCE_NOTIFICATION"
             android:title="Notification when entering/exiting geofence" />

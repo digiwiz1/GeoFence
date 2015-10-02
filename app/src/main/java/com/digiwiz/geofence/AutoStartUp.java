@@ -45,7 +45,6 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
     public void onCreate() {
         super.onCreate();
 
-        //this.geofenceList = new ArrayList<>();
         this.geoStore = new SimpleGeofenceStore(this);
 
         if (!isGooglePlayServicesAvailable()) {
@@ -60,10 +59,9 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
 
         mApiClient.connect();
 
-        // To use the preferences when the activity starts and when the user navigates back from the settings activity.
+        // set listener for shared preferences; when mainactivity changes the prefs the service will reconfigure
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mPrefs.registerOnSharedPreferenceChangeListener(this);
-
     }
 
     /**
@@ -87,7 +85,7 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
         mLocationRequestIntent = getLocationPendingIntent();
 
         if (mApiClient.isConnected()) {
-            enableCoordinates();
+            enableLocationTracking();
             addGeoFence();
         } else {
             Log.i(Constants.LOG_TAG, "Googgle Play services not connected");
@@ -101,15 +99,15 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
         }
     }
 
-    public void reloadGeoFence() {
-        //remove the fences from the API
+    private void reloadGeoFence() {
+        //remove geofences from the API
         LocationServices.GeofencingApi.removeGeofences(mApiClient, mGeofenceRequestIntent);
 
         //re-add the geofences
         addGeoFence();
     }
 
-    public void addGeoFence() {
+    private void addGeoFence() {
         GeofencingRequest requests = geoStore.getGeofencingRequests();
         if (requests == null) {
             Log.w(Constants.LOG_TAG, "No configuration found. Please configure the geofence first...");
@@ -138,7 +136,7 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
         Log.e(Constants.LOG_TAG, "Connection to Google Play services failed with error code " + errorCode);
     }
 
-    public void enableCoordinates() {
+    private void enableLocationTracking() {
 
         if (geoStore.getLocationActivePolling()) {
             Log.i(Constants.LOG_TAG, "Active Location polling is enabled");
@@ -161,8 +159,14 @@ public class AutoStartUp extends Service implements GoogleApiClient.ConnectionCa
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        enableCoordinates();
+        enableLocationTracking();
         reloadGeoFence();
+    }
+
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
     }
 
 }

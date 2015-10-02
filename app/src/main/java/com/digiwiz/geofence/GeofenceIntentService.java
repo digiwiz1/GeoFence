@@ -20,23 +20,9 @@ import java.util.Date;
 
 public class GeofenceIntentService extends IntentService /*implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener */ {
     public static final String TRANSITION_INTENT_SERVICE = "ReceiveTransitionsIntentService";
-    //private GoogleApiClient mGoogleApiClient;
-    private SimpleGeofenceStore geoStore;
 
     public GeofenceIntentService() {
         super(TRANSITION_INTENT_SERVICE);
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        /*mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-                */
-        geoStore = new SimpleGeofenceStore(this);
     }
 
     @Override
@@ -55,11 +41,19 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
 
             switch (transitionType) {
                 case Geofence.GEOFENCE_TRANSITION_ENTER:
+                    //Call Geofence Enter URL
+                    StringBuffer response = httpRequest.request(SimpleGeofenceStore.getGeoFenceEnterUrl());
 
-                    Log.i(Constants.LOG_TAG, currentDateTimeString + ": Entering GeoFence ");
-                    Log.i(Constants.LOG_TAG, "- Latitude:  " + triggeringLocation.getLatitude());
-                    Log.i(Constants.LOG_TAG, "- Longitude: " + triggeringLocation.getLongitude());
-                    Log.i(Constants.LOG_TAG, "- Accuracy:  " + Math.round(triggeringLocation.getAccuracy()) + " meter");
+                    if (SimpleGeofenceStore.getGeofenceShowInLog()) {
+                        String contentText = currentDateTimeString + ": Geofence entered (LAT:" + triggeringLocation.getLatitude() + " LON:" + triggeringLocation.getLongitude() +
+                                " Accuracy:" + Math.round(triggeringLocation.getAccuracy()) + "m)";
+                        Log.i(Constants.LOG_TAG, contentText);
+
+                        //Log HTTP error response
+                        if (response.length() > 0)
+                            Log.i(Constants.LOG_TAG, "HTTP Error:" + response);
+
+                    }
 
                     // Since we only support 1 geofence we can get the first geofence id triggered.
                     // in some cases you might want to consider the full list
@@ -67,22 +61,27 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
                     String triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0)
                             .getRequestId();
 
-                    Log.i(Constants.LOG_TAG, "HTTP Response:" + String.valueOf(httpRequest.request(geoStore.getGeoFenceEnterUrl())));
-
                     generateNotification(triggeredGeoFenceId, "Entering", triggeringLocation);
 
                     break;
 
                 case Geofence.GEOFENCE_TRANSITION_EXIT:
-                    Log.i(Constants.LOG_TAG, currentDateTimeString + ": Exiting GeoFence");
-                    Log.i(Constants.LOG_TAG, "- Latitude:  " + triggeringLocation.getLatitude());
-                    Log.i(Constants.LOG_TAG, "- Longitude: " + triggeringLocation.getLongitude());
-                    Log.i(Constants.LOG_TAG, "- Accuracy:  " + Math.round(triggeringLocation.getAccuracy()) + " meter");
+                    //Call Geofence Exit URL
+                    response = httpRequest.request(SimpleGeofenceStore.getGeoFenceExitUrl());
+
+                    if (SimpleGeofenceStore.getGeofenceShowInLog()) {
+
+                        String contentText = currentDateTimeString + ": Geofence exited (LAT:" + triggeringLocation.getLatitude() + " LON:" + triggeringLocation.getLongitude() +
+                                " Accuracy:" + Math.round(triggeringLocation.getAccuracy()) + "m)";
+                        Log.i(Constants.LOG_TAG, contentText);
+
+                        //Log HTTP error response
+                        if (response.length() > 0)
+                            Log.i(Constants.LOG_TAG, "HTTP Error:" + response);
+                    }
 
                     triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0)
                             .getRequestId();
-
-                    Log.i(Constants.LOG_TAG, "HTTP Response:" + String.valueOf(httpRequest.request(geoStore.getGeoFenceExitUrl())));
 
                     generateNotification(triggeredGeoFenceId, "Leaving", triggeringLocation);
 
@@ -95,10 +94,7 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
     }
 
     private void generateNotification(String locationId, String notifyText, Location triggeringLocation) {
-
-        SimpleGeofenceStore store = new SimpleGeofenceStore(this);
-
-        if (store.getGeofenceNotify()) {
+        if (SimpleGeofenceStore.getGeofenceNotify()) {
 
             long when = System.currentTimeMillis();
 
@@ -129,20 +125,4 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
         }
     }
 
-    /*
-    @Override
-    public void onConnected(Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
-    */
 }
