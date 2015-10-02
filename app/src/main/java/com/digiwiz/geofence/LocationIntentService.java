@@ -88,7 +88,7 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
 
             NotificationCompat.Builder builder =
                     new NotificationCompat.Builder(this)
-                            .setSmallIcon(R.drawable.dac_logo)
+                            .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle("Current coordinates")
                             .setContentText(contentText)
                             .setContentIntent(pendingIntent)

@@ -121,7 +121,7 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
 
             NotificationCompat.Builder builder =
                     new NotificationCompat.Builder(this)
-                            .setSmallIcon(R.drawable.dac_logo)
+                            .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle(locationId + " " + notifyText)
                             .setContentText(contentText)
                             .setContentIntent(pendingIntent)

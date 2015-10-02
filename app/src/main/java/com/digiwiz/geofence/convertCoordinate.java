@@ -13,6 +13,7 @@ public class convertCoordinate {
         String rslt;
 
         if (c < 0) {
+            c = c * -1;
             rslt = "S " + f.format(c) + '\u00B0';
         } else
             rslt = "N " + f.format(c) + '\u00B0';
@@ -26,6 +27,7 @@ public class convertCoordinate {
         String rslt;
 
         if (c < 0) {
+            c = c * -1;
             rslt = "E " + f.format(c) + '\u00B0';
         } else
             rslt = "W " + f.format(c) + '\u00B0';
