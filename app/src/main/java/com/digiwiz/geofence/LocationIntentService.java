@@ -46,15 +46,23 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
         if (SimpleGeofenceStore.getLocationShowInLog()) {
+            //Format coordinate to 5 decimals (which represent an accuracy of 1.1 meter. See http://gis.stackexchange.com/questions/8650/how-to-measure-the-accuracy-of-latitude-and-longitude for more info)
 
             //calc distance to geofence
             Location geoFence = new Location("");
             geoFence.setLatitude(SimpleGeofenceStore.getLatitude());
             geoFence.setLongitude(SimpleGeofenceStore.getLongitude());
-            int distance = Math.round(triggeringLocation.distanceTo(geoFence));
 
-            String contentText = currentDateTimeString + ": Location update (LAT:" + triggeringLocation.getLatitude() + " LON:" + triggeringLocation.getLongitude() +
-                    " Accuracy:" + Math.round(triggeringLocation.getAccuracy()) + "m" + " Distance: " + distance + "m)";
+            String contentText = currentDateTimeString
+                    + ": Location update ("
+                    + convertCoordinate.convertLatitude(triggeringLocation.getLatitude())
+                    + " "
+                    + convertCoordinate.convertLongitude(triggeringLocation.getLongitude())
+                    + " Accuracy:"
+                    + Math.round(triggeringLocation.getAccuracy())
+                    + "m Distance: "
+                    + Math.round(triggeringLocation.distanceTo(geoFence))
+                    + "m)";
             Log.i(Constants.LOG_TAG, contentText);
         }
 
@@ -66,8 +74,12 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
     private void generateNotification(String address, Location triggeringLocation) {
             long when = System.currentTimeMillis();
 
-            String contentText = triggeringLocation.getLatitude() + "," + triggeringLocation.getLongitude() +
-                    " (" + Math.round(triggeringLocation.getAccuracy()) + "m)";
+        String contentText = convertCoordinate.convertLatitude(triggeringLocation.getLatitude())
+                + " "
+                + convertCoordinate.convertLongitude(triggeringLocation.getLongitude())
+                + " ("
+                + Math.round(triggeringLocation.getAccuracy())
+                + "m)";
 
             Intent notifyIntent = new Intent(this, MainActivity.class);
             notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

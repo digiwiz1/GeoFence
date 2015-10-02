@@ -45,9 +45,15 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
                     StringBuffer response = httpRequest.request(SimpleGeofenceStore.getGeoFenceEnterUrl());
 
                     if (SimpleGeofenceStore.getGeofenceShowInLog()) {
-                        String contentText = currentDateTimeString + ": Geofence entered (LAT:" + triggeringLocation.getLatitude() + " LON:" + triggeringLocation.getLongitude() +
-                                " Accuracy:" + Math.round(triggeringLocation.getAccuracy()) + "m)";
+                        String contentText = currentDateTimeString
+                                + ": Geofence entered ("
+                                + convertCoordinate.convertLatitude(triggeringLocation.getLatitude())
+                                + " "
+                                + convertCoordinate.convertLongitude(triggeringLocation.getLongitude()) +
+                                " Accuracy:"
+                                + Math.round(triggeringLocation.getAccuracy()) + "m)";
                         Log.i(Constants.LOG_TAG, contentText);
+
 
                         //Log HTTP error response
                         if (response.length() > 0)
@@ -71,7 +77,11 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
 
                     if (SimpleGeofenceStore.getGeofenceShowInLog()) {
 
-                        String contentText = currentDateTimeString + ": Geofence exited (LAT:" + triggeringLocation.getLatitude() + " LON:" + triggeringLocation.getLongitude() +
+                        String contentText = currentDateTimeString
+                                + ": Geofence exited (:"
+                                + convertCoordinate.convertLatitude(triggeringLocation.getLatitude())
+                                + " "
+                                + convertCoordinate.convertLongitude(triggeringLocation.getLongitude()) +
                                 " Accuracy:" + Math.round(triggeringLocation.getAccuracy()) + "m)";
                         Log.i(Constants.LOG_TAG, contentText);
 
@@ -98,8 +108,11 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
 
             long when = System.currentTimeMillis();
 
-            String contentText = triggeringLocation.getLatitude() + "," + triggeringLocation.getLongitude() +
-                    " (" + Math.round(triggeringLocation.getAccuracy()) + "m)";
+            String contentText = convertCoordinate.convertLatitude(triggeringLocation.getLatitude())
+                    + " "
+                    + convertCoordinate.convertLongitude(triggeringLocation.getLongitude())
+                    + " ("
+                    + Math.round(triggeringLocation.getAccuracy()) + "m)";
 
             Intent notifyIntent = new Intent(this, MainActivity.class);
             notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
