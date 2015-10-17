@@ -19,7 +19,7 @@ import java.util.Date;
 
 
 public class GeofenceIntentService extends IntentService /*implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener */ {
-    public static final String TRANSITION_INTENT_SERVICE = "ReceiveTransitionsIntentService";
+    public static final String TRANSITION_INTENT_SERVICE = "GeofenceTransitionsIntentService";
 
     public GeofenceIntentService() {
         super(TRANSITION_INTENT_SERVICE);
@@ -31,15 +31,19 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
         GeofencingEvent geoFenceEvent = GeofencingEvent.fromIntent(intent);
 
         if (geoFenceEvent.hasError()) {
-            int errorCode = geoFenceEvent.getErrorCode();
-            Log.e(Constants.LOG_TAG, "Location Services error: " + errorCode);
+            Log.e(Constants.LOG_TAG, "Location Services error: " + geoFenceEvent.getErrorCode());
         } else {
 
-            int transitionType = geoFenceEvent.getGeofenceTransition();
+            //Get location where geofence transition was triggered
             Location triggeringLocation = geoFenceEvent.getTriggeringLocation();
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
-            switch (transitionType) {
+            //Get location of geofence
+            Location geoFence = new Location("");
+            geoFence.setLatitude(SimpleGeofenceStore.getLatitude());
+            geoFence.setLongitude(SimpleGeofenceStore.getLongitude());
+
+            switch (geoFenceEvent.getGeofenceTransition()) {
                 case Geofence.GEOFENCE_TRANSITION_ENTER:
                     //Call Geofence Enter URL
                     StringBuffer response = httpRequest.request(SimpleGeofenceStore.getGeoFenceEnterUrl());
@@ -49,11 +53,11 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
                                 + ": Geofence entered ("
                                 + convertCoordinate.convertLatitude(triggeringLocation.getLatitude())
                                 + " "
-                                + convertCoordinate.convertLongitude(triggeringLocation.getLongitude()) +
-                                " Accuracy:"
-                                + Math.round(triggeringLocation.getAccuracy()) + "m)";
+                                + convertCoordinate.convertLongitude(triggeringLocation.getLongitude())
+                                + " Accuracy:"
+                                + Math.round(triggeringLocation.getAccuracy()) + "m"
+                                + " Distance: " + Math.round(triggeringLocation.distanceTo(geoFence)) + "m)";
                         Log.i(Constants.LOG_TAG, contentText);
-
 
                         //Log HTTP error response
                         if (response.length() > 0)
@@ -61,14 +65,14 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
 
                     }
 
-                    // Since we only support 1 geofence we can get the first geofence id triggered.
-                    // in some cases you might want to consider the full list
-                    // of geofences triggered.
-                    String triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0)
-                            .getRequestId();
-
-                    generateNotification(triggeredGeoFenceId, "Entering", triggeringLocation);
-
+                    if (SimpleGeofenceStore.getGeofenceNotify()) {
+                        // Since we only support 1 geofence we can get the first geofence id triggered.
+                        // in some cases you might want to consider the full list
+                        // of geofences triggered.
+                        String triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0)
+                                .getRequestId();
+                        generateNotification(triggeredGeoFenceId, "Entering", triggeringLocation);
+                    }
                     break;
 
                 case Geofence.GEOFENCE_TRANSITION_EXIT:
@@ -81,8 +85,10 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
                                 + ": Geofence exited (:"
                                 + convertCoordinate.convertLatitude(triggeringLocation.getLatitude())
                                 + " "
-                                + convertCoordinate.convertLongitude(triggeringLocation.getLongitude()) +
-                                " Accuracy:" + Math.round(triggeringLocation.getAccuracy()) + "m)";
+                                + convertCoordinate.convertLongitude(triggeringLocation.getLongitude())
+                                + " Accuracy:"
+                                + Math.round(triggeringLocation.getAccuracy()) + "m"
+                                + " Distance: " + Math.round(triggeringLocation.distanceTo(geoFence)) + "m)";
                         Log.i(Constants.LOG_TAG, contentText);
 
                         //Log HTTP error response
@@ -90,10 +96,11 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
                             Log.i(Constants.LOG_TAG, "HTTP Error:" + response);
                     }
 
-                    triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0)
-                            .getRequestId();
-
-                    generateNotification(triggeredGeoFenceId, "Leaving", triggeringLocation);
+                    if (SimpleGeofenceStore.getGeofenceNotify()) {
+                        String triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0)
+                                .getRequestId();
+                        generateNotification(triggeredGeoFenceId, "Leaving", triggeringLocation);
+                    }
 
                     break;
 
@@ -104,38 +111,35 @@ public class GeofenceIntentService extends IntentService /*implements GoogleApiC
     }
 
     private void generateNotification(String locationId, String notifyText, Location triggeringLocation) {
-        if (SimpleGeofenceStore.getGeofenceNotify()) {
 
-            long when = System.currentTimeMillis();
+        String contentText = convertCoordinate.convertLatitude(triggeringLocation.getLatitude())
+                + " "
+                + convertCoordinate.convertLongitude(triggeringLocation.getLongitude())
+                + " ("
+                + Math.round(triggeringLocation.getAccuracy()) + "m)";
 
-            String contentText = convertCoordinate.convertLatitude(triggeringLocation.getLatitude())
-                    + " "
-                    + convertCoordinate.convertLongitude(triggeringLocation.getLongitude())
-                    + " ("
-                    + Math.round(triggeringLocation.getAccuracy()) + "m)";
+        Intent notifyIntent = new Intent(this, MainActivity.class);
+        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-            Intent notifyIntent = new Intent(this, MainActivity.class);
-            notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(locationId + " " + notifyText)
+                        .setContentText(contentText)
+                        .setContentIntent(pendingIntent)
+                        .setAutoCancel(true)
+                        .setDefaults(Notification.DEFAULT_SOUND)
+                        .setWhen(System.currentTimeMillis());
 
-            NotificationCompat.Builder builder =
-                    new NotificationCompat.Builder(this)
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle(locationId + " " + notifyText)
-                            .setContentText(contentText)
-                            .setContentIntent(pendingIntent)
-                            .setAutoCancel(true)
-                            .setDefaults(Notification.DEFAULT_SOUND)
-                            .setWhen(when);
+        //Get the notificationManager
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-            //Get the notificationManager
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        //Send notification- always with ID=1 so it will update existing notifications
+        notificationManager.notify(1, builder.build());
 
-            //Send notification- always with ID=1 so it will update existing notifications
-            notificationManager.notify(1, builder.build());
-        }
     }
 
 }
