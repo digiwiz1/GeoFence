@@ -21,8 +21,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class LocationIntentService extends IntentService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    public static final String LOCATION_UPDATE_INTENT_SERVICE = "LocationIntentService";
-    // The SharedPreferences object in which geofences are stored.
+    public static final String LOCATION_UPDATE_INTENT_SERVICE = "GeofenceLocationIntentService";
     private GoogleApiClient mGoogleApiClient;
 
     public LocationIntentService() {
@@ -43,10 +42,8 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
     protected void onHandleIntent(Intent intent) {
         Location triggeringLocation = intent.getParcelableExtra(FusedLocationProviderApi.KEY_LOCATION_CHANGED);
 
-        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-
         if (SimpleGeofenceStore.getLocationShowInLog()) {
-            //Format coordinate to 5 decimals (which represent an accuracy of 1.1 meter. See http://gis.stackexchange.com/questions/8650/how-to-measure-the-accuracy-of-latitude-and-longitude for more info)
+            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 
             //calc distance to geofence
             Location geoFence = new Location("");
@@ -72,8 +69,6 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
     }
 
     private void generateNotification(String address, Location triggeringLocation) {
-            long when = System.currentTimeMillis();
-
         String contentText = convertCoordinate.convertLatitude(triggeringLocation.getLatitude())
                 + " "
                 + convertCoordinate.convertLongitude(triggeringLocation.getLongitude())
@@ -94,7 +89,7 @@ public class LocationIntentService extends IntentService implements GoogleApiCli
                             .setContentIntent(pendingIntent)
                             .setAutoCancel(true)
                             .setDefaults(Notification.DEFAULT_SOUND)
-                            .setWhen(when);
+                            .setWhen(System.currentTimeMillis());
 
             //Get the notificationManager
             NotificationManager notificationManager =
